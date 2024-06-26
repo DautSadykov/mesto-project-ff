@@ -1,5 +1,7 @@
 // @todo: Темплейт карточки
 
+console.log('Hello world!')
+
 // @todo: DOM узлы
 
 // @todo: Функция создания карточки
