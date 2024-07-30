@@ -8,13 +8,13 @@
     />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Mesto</title>
-    <link rel="stylesheet" href="./pages/index.css" />
+    <!-- <link rel="stylesheet" href="./pages/index.css" /> -->
   </head>
   <body class="page">
     <div class="page__content">
       <header class="header page__section">
         <img
-          src="./images/logo.svg"
+          src="<%=require('./images/logo.svg')%>"
           alt="Логотип проекта масто"
           class="logo header__logo"
         />
@@ -23,7 +23,6 @@
         <section class="profile page__section">
           <div
             class="profile__image"
-            style="background-image: url('./images/avatar.jpg')"
           ></div>
           <div class="profile__info">
             <h1 class="profile__title">Жак-Ив Кусто</h1>
@@ -97,8 +96,6 @@
         </div>
       </div>
     </div>
-    <script src="./scripts/cards.js"></script>
-    <script src="./scripts/index.js" defer></script>
 
     <template id="card-template">
       <li class="places__item card">
@@ -112,3 +109,118 @@
     </template>
   </body>
 </html>
+
+
+import './pages/index.css';
+import { initialCards } from './cards.js'
+import { createCard, deleteCard } from './components/card.js';
+import { handleClosePopup, handleOpenPopup } from './components/modal.js';
+
+
+const placesList = document.querySelector('.places__list');
+const editButton = document.querySelector('.profile__edit-button');
+const editPopup = document.querySelector('.popup_type_edit');
+const addCardButton = document.querySelector('.profile__add-button')
+const addCardPopup = document.querySelector('.popup_type_new-card')
+
+
+initialCards.forEach((card) => {
+    placesList.append(createCard(card, deleteCard));
+})
+
+const cardImages = document.querySelectorAll('.card__image')
+const cardPopup = document.querySelector('.popup_type_image')
+
+handleOpenPopup(editButton, editPopup)
+handleOpenPopup(addCardButton, addCardPopup)
+handleClosePopup(editPopup)
+handleClosePopup(addCardPopup)
+
+cardImages.forEach((cardImage) => {
+    handleOpenPopup(cardImage, cardPopup)    
+    handleClosePopup(cardPopup)
+})
+
+
+
+
+export function handleOpenPopup(openButton, targetPopup) {
+    openButton.addEventListener('click', () => {
+        targetPopup.style.display = 'flex'
+    })
+}
+
+export function handleClosePopup(targetPopup) {
+    targetPopup.addEventListener('click', (evt) => {
+        if (evt.target.classList.contains('popup__close')) {
+            targetPopup.style.display = 'none'
+        }
+    })
+
+    window.addEventListener('click', (evt) => {
+        if (evt.target.classList.contains('popup')) {
+            targetPopup.style.display = 'none'
+        }
+    })
+    
+    document.addEventListener('keydown', (evt) => {
+        if (evt.key === 'Escape') {
+            targetPopup.style.display = 'none'
+        }     
+    })
+}
+
+
+import { initialCards } from '../cards.js'
+
+export function createCard(cardInfo, deleteCard) {
+    const cardTemplate = document.querySelector('#card-template').content
+    const cardElement = cardTemplate.querySelector('.card').cloneNode(true);
+    
+    cardElement.querySelector('.card__title').textContent = cardInfo.name;
+    cardElement.querySelector('.card__image').alt = cardInfo.name;
+    cardElement.querySelector('.card__image').src = cardInfo.link;
+    
+    const deleteButton = cardElement.querySelector('.card__delete-button');
+    deleteButton.addEventListener('click', () => {
+        deleteCard(deleteButton)
+    })
+
+    document.querySelector('.popup__image').src = cardInfo.link;
+
+    return cardElement
+}
+
+export const deleteCard = (deleteButton) => {
+    const cardElement = deleteButton.closest('.card');
+    cardElement.remove();
+}
+
+export const initialCards = [
+    {
+      name: "Архыз",
+      link: "https://pictures.s3.yandex.net/frontend-developer/cards-compressed/arkhyz.jpg",
+    },
+    {
+      name: "Челябинская область",
+      link: "https://pictures.s3.yandex.net/frontend-developer/cards-compressed/chelyabinsk-oblast.jpg",
+    },
+    {
+      name: "Иваново",
+      link: "https://pictures.s3.yandex.net/frontend-developer/cards-compressed/ivanovo.jpg",
+    },
+    {
+      name: "Камчатка",
+      link: "https://pictures.s3.yandex.net/frontend-developer/cards-compressed/kamchatka.jpg",
+    },
+    {
+      name: "Холмогорский район",
+      link: "https://pictures.s3.yandex.net/frontend-developer/cards-compressed/kholmogorsky-rayon.jpg",
+    },
+    {
+      name: "Байкал",
+      link: "https://pictures.s3.yandex.net/frontend-developer/cards-compressed/baikal.jpg",
+    }
+];
+
+// i want to be able to open a .popup_type_image when i press .card__image, and pass .popup__image its src

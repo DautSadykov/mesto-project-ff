@@ -11,3 +11,7 @@
     margin: 0 0 0 7px;
   }
 }
+
+.profile__image {
+  background-image: url('../../../images/avatar.jpg')
+}
