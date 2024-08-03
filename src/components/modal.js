@@ -1,45 +1,31 @@
-export function openModal(openButton, targetPopup) {
-    openButton.addEventListener('click', () => {
-        targetPopup.style.display = 'flex'
-        setTimeout(() => {
-            targetPopup.style.opacity = '1';
-        }, 0);
-    })
+export function openModal(targetPopup) {
+    targetPopup.classList.add('popup_is-opened')
+    document.addEventListener('keydown', closeOnKeyDown)
+}
+    
+export function openCardModal(cardElement, cardInfo) {
+    const cardImage = cardElement.querySelector('.card__image')
+    const cardPopup = document.querySelector('.popup_type_image')
+    cardImage.addEventListener('click', () => openModal(cardPopup))
+    cardPopup.querySelector('.popup__image').src = cardInfo.link
+    cardPopup.querySelector('.popup__caption').textContent = cardInfo.name
+    document.addEventListener('keydown', closeOnKeyDown)
 }
 
-export function closeModal(targetPopup) {
-    targetPopup.addEventListener('click', (evt) => {
-        if (evt.target.classList.contains('popup__close')) {
-            closePopupSmooth(targetPopup)
-        }
-    })
-    
-    targetPopup.addEventListener('submit', () => {
-        closePopupSmooth(targetPopup)
-    })
-    
-    window.addEventListener('click', (evt) => {
-        if (evt.target.classList.contains('popup')) {
-            closePopupSmooth(targetPopup)
-        }
-    })
-    
-    document.addEventListener('keydown', (evt) => {
-        if (evt.key === 'Escape') {
-            closePopupSmooth(targetPopup)
-        }     
-    })
+
+export function closePopupByOverlay(evt) {
+    if (evt.target.classList.contains("popup")) { 
+        closePopup(evt.target); 
+    }
 }
 
-function closePopupSmooth(popup) {
-    popup.style.transition = "opacity 0.3s ease"
-    popup.style.opacity = "0"
-    setTimeout(() => {
-        popup.style.display = 'none';
-    }, 300);
+export function closePopup(popup) {
+    popup.classList.remove('popup_is-opened')
+    document.removeEventListener('keydown', closeOnKeyDown)
 }
 
-document.querySelectorAll('.popup').forEach(popup => {
-    popup.style.opacity = '0';
-    popup.style.transition = 'opacity 0.3s ease';
-});
+export function closeOnKeyDown(evt) { 
+    if (evt.key === 'Escape') { 
+        closePopup(document.querySelector('.popup_is-opened'))
+    }      
+}
