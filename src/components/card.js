@@ -7,8 +7,12 @@ export function createCard(cardInfo, like, deleteCard, openCardModal) {
     cardElement.querySelector('.card__image').src = cardInfo.link;
     cardElement.querySelector('.card__like-button').addEventListener('click', like)
     
-    openCardModal(cardElement, cardInfo)
-    deleteCard(cardElement)
+    const deleteButton = cardElement.querySelector('.card__delete-button');
+    deleteButton.addEventListener('click', () => {
+        deleteCard(deleteButton)
+    })
+
+    cardElement.querySelector('.card__image').addEventListener('click', () => openCardModal(cardInfo))
 
     return cardElement
 }
@@ -19,12 +23,10 @@ export function likeCard(evt)  {
     }
 }
 
-export function deleteCard(card) {
-    const deleteButton = card.querySelector('.card__delete-button');
-    deleteButton.addEventListener('click', () => {
-        const cardElement = deleteButton.closest('.card');
-        cardElement.remove();
-    })
+
+export function deleteCard(deleteButton) {
+    const cardElement = deleteButton.closest('.card');
+    cardElement.remove();
 }
 
 
