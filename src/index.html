@@ -47,18 +47,28 @@
               type="text"
               name="name"
               class="popup__input popup__input_type_name"
+              id="name-input"
               placeholder="Имя"
               required
-            />
-            <input
+              minlength="2"
+              maxlength="40"
+              pattern="^[a-zA-Zа-яА-ЯёЁ\s\-]+$"
+              />
+              <span class="popup__input-error-text name-input-error"></span>
+              <input
               type="text"
               name="description"
               class="popup__input popup__input_type_description"
+              id="description-input"
               placeholder="Занятие"
               required
-            />
-            <button type="submit" class="button popup__button">
-              Сохранить
+              minlength="2"
+              maxlength="400"
+              pattern="^[a-zA-Zа-яА-ЯёЁ\s\-]+$"
+              />
+              <span class="popup__input-error-text description-input-error"></span>
+              <button type="submit" class="button popup__button">
+                Сохранить
             </button>
           </form>
         </div>
@@ -72,16 +82,23 @@
               type="text"
               name="place-name"
               class="popup__input popup__input_type_card-name"
+              id="card-name-input"
               placeholder="Название"
               required
+              minlength="2"
+              maxlength="30"
+              pattern="^[a-zA-Zа-яА-ЯёЁ\s\-]+$"
             />
+            <span class="popup__input-error-text card-name-input-error"></span>
             <input
               type="url"
               name="link"
               class="popup__input popup__input_type_url"
+              id="url-input"
               placeholder="Ссылка на картинку"
               required
             />
+            <span class="popup__input-error-text url-input-error"></span>
             <button type="submit" class="button popup__button">
               Сохранить
             </button>
