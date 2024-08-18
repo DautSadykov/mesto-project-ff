@@ -21,9 +21,7 @@
       <main class="content">
         <section class="profile page__section">
           <button class="profile__change-avatar-button">
-            <div
-              class="profile__image"
-            ></div>
+            <div class="profile__image"></div>
           </button>
           <div class="profile__info">
             <h1 class="profile__title"></h1>
@@ -54,9 +52,9 @@
               minlength="2"
               maxlength="40"
               pattern="^[a-zA-Zа-яА-ЯёЁ\s\-]+$"
-              />
-              <span class="popup__input-error-text name-input-error"></span>
-              <input
+            />
+            <span class="popup__input-error-text name-input-error"></span>
+            <input
               type="text"
               name="description"
               class="popup__input popup__input_type_description"
@@ -66,10 +64,12 @@
               minlength="2"
               maxlength="400"
               pattern="^[a-zA-Zа-яА-ЯёЁ\s\-]+$"
-              />
-              <span class="popup__input-error-text description-input-error"></span>
-              <button type="submit" class="button popup__button">
-                Сохранить
+            />
+            <span
+              class="popup__input-error-text description-input-error"
+            ></span>
+            <button type="submit" class="button popup__button">
+              Сохранить
             </button>
           </form>
         </div>

@@ -4,9 +4,11 @@ import {
   openModal,
   closePopupByOverlay,
   closePopup,
+  renderLoading,
 } from "./components/modal.js";
 import { likeCard, deleteCard } from "./components/card.js";
 import { enableValidation, clearValidation } from "./components/validation.js";
+import { getInitialCards, fillInfoOnLoad } from "./components/api.js";
 
 const validationConfig = {
   formSelector: ".popup__form",
@@ -23,33 +25,8 @@ const avatarImage = document.querySelector(".profile__image");
 const profileName = document.querySelector(".profile__title");
 const profileDescription = document.querySelector(".profile__description");
 
-fetch("https://nomoreparties.co/v1/wff-cohort-20/users/me", {
-  method: "GET",
-  headers: {
-    authorization: "b91af8f2-857f-407b-86ef-9cd78ad6bef5",
-    "Content-Type": "application/json",
-  },
-})
-  .then((res) => res.json())
-  .then((res) => {
-    avatarImage.style.backgroundImage = `url('${res.avatar}')`;
-    profileName.textContent = res.name;
-    profileDescription.textContent = res.about;
-  });
-
-fetch("https://nomoreparties.co/v1/wff-cohort-20/cards", {
-  headers: {
-    authorization: "b91af8f2-857f-407b-86ef-9cd78ad6bef5",
-  },
-})
-  .then((res) => res.json())
-  .then((result) => {
-    result.forEach((cardInfo) => {
-      placesList.append(
-        createCard(cardInfo, likeCard, deleteCard, openCardModal)
-      );
-    });
-  });
+fillInfoOnLoad(avatarImage, profileName, profileDescription);
+getInitialCards(placesList, openCardModal);
 
 popups.forEach((popup) => {
   popup.classList.add("popup_is-animated");
@@ -106,10 +83,15 @@ function handleEditFormSubmit(evt) {
       about: job,
     }),
   })
-    .then((res) => res.json())
+    .then((res) =>
+      res.ok() ? res.json() : Promise.reject(`Ошибка: ${res.status}`)
+    )
     .then((res) => {
       profileName.textContent = res.name;
       profileDescription.textContent = res.about;
+    })
+    .catch((err) => {
+      console.error(err);
     })
     .finally(() => {
       renderLoading(false);
@@ -153,11 +135,16 @@ function handleNewPlaceFormSubmit(evt) {
       link: link,
     }),
   })
-    .then((res) => res.json())
+    .then((res) =>
+      res.ok() ? res.json() : Promise.reject(`Ошибка: ${res.status}`)
+    )
     .then((res) => {
       placesList.prepend(
         createCard(res, likeCard, deleteCard, openCardModal, closePopup)
       );
+    })
+    .catch((err) => {
+      console.error(err);
     })
     .finally(() => {
       renderLoading(false);
@@ -198,7 +185,9 @@ function handleChangeAvatarSubmit(evt) {
       avatar: link,
     }),
   })
-    .then((res) => res.json())
+    .then((res) =>
+      res.ok() ? res.json() : Promise.reject(`Ошибка: ${res.status}`)
+    )
     .then((res) => {
       console.log(res.avatar);
       avatarImage.style.backgroundImage = `url('${res.avatar}')`;
@@ -216,11 +205,3 @@ function handleChangeAvatarSubmit(evt) {
 formChangeAvatar.addEventListener("submit", handleChangeAvatarSubmit);
 
 enableValidation(validationConfig);
-
-function renderLoading(isLoading, saveButton) {
-  if (isLoading) {
-    document.querySelector(".popup__button").textContent = "Сохраняется...";
-  } else {
-    document.querySelector(".popup__button").textContent = "Сохранить";
-  }
-}
