@@ -190,7 +190,6 @@ function handleChangeAvatarSubmit(evt) {
         res.ok ? res.json() : Promise.reject(`Ошибка: ${res.status}`)
 )
 .then((res) => {
-    console.log(res.avatar);
     avatarImage.style.backgroundImage = `url('${res.avatar}')`;
 })
 .catch((err) => {
