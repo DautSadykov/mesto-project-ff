@@ -26,6 +26,7 @@ const profileName = document.querySelector(".profile__title");
 const profileDescription = document.querySelector(".profile__description");
 
 fillInfoOnLoad(avatarImage, profileName, profileDescription);
+
 getInitialCards(placesList, openCardModal);
 
 popups.forEach((popup) => {
@@ -84,7 +85,7 @@ function handleEditFormSubmit(evt) {
     }),
   })
     .then((res) =>
-      res.ok() ? res.json() : Promise.reject(`Ошибка: ${res.status}`)
+      res.ok ? res.json() : Promise.reject(`Ошибка: ${res.status}`)
     )
     .then((res) => {
       profileName.textContent = res.name;
@@ -136,7 +137,7 @@ function handleNewPlaceFormSubmit(evt) {
     }),
   })
     .then((res) =>
-      res.ok() ? res.json() : Promise.reject(`Ошибка: ${res.status}`)
+      res.ok ? res.json() : Promise.reject(`Ошибка: ${res.status}`)
     )
     .then((res) => {
       placesList.prepend(
@@ -159,47 +160,48 @@ formNewPlace.addEventListener("submit", handleNewPlaceFormSubmit);
 // change avatar form
 
 const changeAvatarButton = document.querySelector(
-  ".profile__change-avatar-button"
+    ".profile__change-avatar-button"
 );
 const changeAvatarPopup = document.querySelector(".popup_type_avatar");
 const avatarLinkInput = document.querySelector(".popup__input_type_avatar");
 const formChangeAvatar = document.forms.changeAvatar;
 
 changeAvatarButton.addEventListener("click", () => {
-  openModal(changeAvatarPopup);
-  clearValidation(formChangeAvatar, validationConfig);
+    openModal(changeAvatarPopup);
+    clearValidation(formChangeAvatar, validationConfig);
 });
 
 function handleChangeAvatarSubmit(evt) {
-  evt.preventDefault();
-  const link = avatarLinkInput.value;
-
-  renderLoading(true);
-  fetch("https://nomoreparties.co/v1/wff-cohort-20/users/me/avatar", {
-    method: "PATCH",
-    headers: {
-      authorization: "b91af8f2-857f-407b-86ef-9cd78ad6bef5",
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      avatar: link,
-    }),
-  })
+    evt.preventDefault();
+    const link = avatarLinkInput.value;
+    
+    renderLoading(true);
+    fetch("https://nomoreparties.co/v1/wff-cohort-20/users/me/avatar", {
+        method: "PATCH",
+        headers: {
+            authorization: "b91af8f2-857f-407b-86ef-9cd78ad6bef5",
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            avatar: link,
+        }),
+    })
     .then((res) =>
-      res.ok() ? res.json() : Promise.reject(`Ошибка: ${res.status}`)
-    )
-    .then((res) => {
-      console.log(res.avatar);
-      avatarImage.style.backgroundImage = `url('${res.avatar}')`;
-    })
-    .catch((err) => {
-      console.error(err);
-    })
-    .finally(() => {
-      renderLoading(false);
-    });
+        res.ok ? res.json() : Promise.reject(`Ошибка: ${res.status}`)
+)
+.then((res) => {
+    console.log(res.avatar);
+    avatarImage.style.backgroundImage = `url('${res.avatar}')`;
+})
+.catch((err) => {
+    console.error(err);
+})
+.finally(() => {
+    renderLoading(false);
+});
 
-  closePopup(changeAvatarPopup);
+closePopup(changeAvatarPopup);
+evt.target.reset();
 }
 
 formChangeAvatar.addEventListener("submit", handleChangeAvatarSubmit);

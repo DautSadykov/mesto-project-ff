@@ -9,8 +9,8 @@ export function createCard(cardInfo, like, deleteCard, openCardModal) {
   cardElement.querySelector(".card__image").src = cardInfo.link;
 
   renderActiveLike(cardInfo, likeButton);
-  likeButton.addEventListener("click", (evt) =>
-    like(evt, cardInfo, likeButton, likeCounter)
+  likeButton.addEventListener("click", () =>
+    like(cardInfo, likeButton, likeCounter)
   );
   likeCounter.textContent = cardInfo.likes.length;
 
@@ -39,53 +39,17 @@ function renderActiveLike(cardInfo, likeButton) {
   }
 }
 
-export function likeCard(evt, likeInfo, likeButton, likeCounter) {
+import { fetchLikeCard, fetchUnlikeCard } from "./api";
+
+export function likeCard(likeInfo, likeButton, likeCounter) {
   const iHaveLiked = likeButton.classList.contains(
     "card__like-button_is-active"
   );
 
   if (!iHaveLiked) {
-    fetch(
-      `https://nomoreparties.co/v1/wff-cohort-20/cards/likes/${likeInfo._id}`,
-      {
-        method: "PUT",
-        headers: {
-          authorization: "b91af8f2-857f-407b-86ef-9cd78ad6bef5",
-          "Content-Type": "application/json",
-        },
-      }
-    )
-      .then((res) =>
-        res.ok() ? res.json() : Promise.reject(`Ошибка: ${res.status}`)
-      )
-      .then((res) => {
-        likeButton.classList.toggle("card__like-button_is-active");
-        likeCounter.textContent = res.likes.length;
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+    fetchLikeCard(likeInfo, likeButton, likeCounter)
   } else {
-    fetch(
-      `https://nomoreparties.co/v1/wff-cohort-20/cards/likes/${likeInfo._id}`,
-      {
-        method: "DELETE",
-        headers: {
-          authorization: "b91af8f2-857f-407b-86ef-9cd78ad6bef5",
-          "Content-Type": "application/json",
-        },
-      }
-    )
-      .then((res) =>
-        res.ok() ? res.json() : Promise.reject(`Ошибка: ${res.status}`)
-      )
-      .then((res) => {
-        likeButton.classList.toggle("card__like-button_is-active");
-        likeCounter.textContent = res.likes.length;
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+    fetchUnlikeCard(likeInfo, likeButton, likeCounter)
   }
 }
 

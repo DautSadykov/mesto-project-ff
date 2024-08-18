@@ -1,17 +1,16 @@
-const showInputError = (
+function showInputError(
   formElement,
   inputElement,
   errorMessage,
   inputErrorClass
-) => {
+) {
   const errorElement = formElement.querySelector(`.${inputElement.id}-error`);
-
   errorElement.textContent = errorMessage;
   errorElement.classList.add("popup__input-error-text_active");
   inputElement.classList.add(inputErrorClass);
 };
 
-const hideInputError = (formElement, inputElement, inputErrorClass) => {
+function hideInputError(formElement, inputElement, inputErrorClass) {
   const errorElement = formElement.querySelector(`.${inputElement.id}-error`);
   if (errorElement) {
     errorElement.classList.remove("popup__input-error-text_active");
@@ -20,7 +19,7 @@ const hideInputError = (formElement, inputElement, inputErrorClass) => {
   inputElement.classList.remove(inputErrorClass);
 };
 
-const checkInputValidity = (formElement, inputElement, inputErrorClass) => {
+function checkInputValidity(formElement, inputElement, inputErrorClass) {
   if (inputElement.validity.patternMismatch) {
     inputElement.setCustomValidity(
       "Разрешены только латинские, кириллические буквы, знаки дефиса и пробелы"
@@ -41,13 +40,13 @@ const checkInputValidity = (formElement, inputElement, inputErrorClass) => {
   }
 };
 
-const hasInvalidInput = (inputList) => {
+function hasInvalidInput(inputList) {
   return inputList.some((inputElement) => {
     return !inputElement.validity.valid;
   });
 };
 
-const toggleButtonState = (inputList, buttonElement, inactiveButtonClass) => {
+function toggleButtonState(inputList, buttonElement, inactiveButtonClass) {
   if (hasInvalidInput(inputList)) {
     buttonElement.classList.add(inactiveButtonClass);
     buttonElement.disabled = true;
@@ -57,7 +56,7 @@ const toggleButtonState = (inputList, buttonElement, inactiveButtonClass) => {
   }
 };
 
-const setEventListeners = (formElement, setting) => {
+function setEventListeners(formElement, setting) {
   const inputList = Array.from(
     formElement.querySelectorAll(setting.inputSelector)
   );
@@ -73,7 +72,7 @@ const setEventListeners = (formElement, setting) => {
   });
 };
 
-export const enableValidation = (setting) => {
+export function enableValidation(setting) {
   const formList = Array.from(document.querySelectorAll(setting.formSelector));
   formList.forEach((formElement) => {
     setEventListeners(formElement, setting);
@@ -83,7 +82,7 @@ export const enableValidation = (setting) => {
   });
 };
 
-export const clearValidation = (formElement, setting) => {
+export function clearValidation(formElement, setting) {
   const inputList = Array.from(
     formElement.querySelectorAll(setting.inputSelector)
   );
