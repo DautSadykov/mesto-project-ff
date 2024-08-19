@@ -1,5 +1,3 @@
-import { likeCard, deleteCard, createCard } from "./card";
-
 const config = {
   baseUrl: "https://nomoreparties.co/v1/wff-cohort-20",
   headers: {
@@ -84,10 +82,10 @@ export function fetchEditFormSubmit(name, job) {
 }
 
 export function fetchNewPlaceFormSubmit(name, link) {
-    return fetch("https://nomoreparties.co/v1/wff-cohort-20/cards", {
+    return fetch(`${config.baseUrl}/cards`, {
         method: "POST",
         headers: {
-          authorization: "b91af8f2-857f-407b-86ef-9cd78ad6bef5",
+          authorization: config.headers.authorization,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -101,10 +99,10 @@ export function fetchNewPlaceFormSubmit(name, link) {
 }
 
 export function fetchChangeAvatarSubmit(link) {
-    return fetch("https://nomoreparties.co/v1/wff-cohort-20/users/me/avatar", {
+    return fetch(`${config.baseUrl}/users/me/avatar`, {
         method: "PATCH",
         headers: {
-            authorization: "b91af8f2-857f-407b-86ef-9cd78ad6bef5",
+            authorization: config.headers.authorization,
             "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -117,10 +115,10 @@ export function fetchChangeAvatarSubmit(link) {
 }
 
 export function fetchDeleteCard(id) {
-    return fetch(`https://nomoreparties.co/v1/wff-cohort-20/cards/${id}`, {
+    return fetch(`${config.baseUrl}/cards/${id}`, {
         method: "DELETE",
         headers: {
-          authorization: "b91af8f2-857f-407b-86ef-9cd78ad6bef5",
+          authorization: config.headers.authorization,
           "Content-Type": "application/json",
         },
       })
