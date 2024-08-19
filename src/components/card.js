@@ -1,4 +1,12 @@
-export function createCard(cardInfo, like, deleteCard, openCardModal) {
+import { fetchDeleteCard, fetchLikeCard, fetchUnlikeCard } from "./api";
+
+export function createCard(
+  cardInfo,
+  like,
+  deleteCard,
+  openCardModal,
+  personalId
+) {
   const cardTemplate = document.querySelector("#card-template").content;
   const cardElement = cardTemplate.querySelector(".card").cloneNode(true);
   const likeButton = cardElement.querySelector(".card__like-button");
@@ -8,19 +16,19 @@ export function createCard(cardInfo, like, deleteCard, openCardModal) {
   cardElement.querySelector(".card__image").alt = cardInfo.name;
   cardElement.querySelector(".card__image").src = cardInfo.link;
 
-  renderActiveLike(cardInfo, likeButton);
+  renderActiveLike(cardInfo, likeButton, personalId);
   likeButton.addEventListener("click", () =>
     like(cardInfo, likeButton, likeCounter)
   );
   likeCounter.textContent = cardInfo.likes.length;
 
   const deleteButton = cardElement.querySelector(".card__delete-button");
+  if (cardInfo.owner._id !== personalId) {
+    deleteButton.classList.add("card_delete-button_disabled");
+  }
   deleteButton.addEventListener("click", () => {
     deleteCard(deleteButton, cardInfo._id);
   });
-  if (cardInfo.owner._id !== "7dda96ba60d1cabf61e4db4a") {
-    deleteButton.classList.add("card_delete-button_disabled");
-  }
 
   cardElement
     .querySelector(".card__image")
@@ -29,17 +37,15 @@ export function createCard(cardInfo, like, deleteCard, openCardModal) {
   return cardElement;
 }
 
-function renderActiveLike(cardInfo, likeButton) {
+function renderActiveLike(cardInfo, likeButton, personalId) {
   if (
     cardInfo.likes.some((like) => {
-      return like._id === "7dda96ba60d1cabf61e4db4a";
+      return like._id === personalId;
     })
   ) {
     likeButton.classList.add("card__like-button_is-active");
   }
 }
-
-import { fetchLikeCard, fetchUnlikeCard } from "./api";
 
 export function likeCard(likeInfo, likeButton, likeCounter) {
   const iHaveLiked = likeButton.classList.contains(
@@ -47,22 +53,33 @@ export function likeCard(likeInfo, likeButton, likeCounter) {
   );
 
   if (!iHaveLiked) {
-    fetchLikeCard(likeInfo, likeButton, likeCounter)
+    fetchLikeCard(likeInfo)
+      .then((res) => {
+        likeButton.classList.toggle("card__like-button_is-active");
+        likeCounter.textContent = res.likes.length;
+      })
+      .catch((err) => {
+        console.error(err);
+      });
   } else {
-    fetchUnlikeCard(likeInfo, likeButton, likeCounter)
+    fetchUnlikeCard(likeInfo)
+      .then((res) => {
+        likeButton.classList.toggle("card__like-button_is-active");
+        likeCounter.textContent = res.likes.length;
+      })
+      .catch((err) => {
+        console.error(err);
+      });
   }
 }
 
 export function deleteCard(deleteButton, id) {
   const cardElement = deleteButton.closest(".card");
-  fetch(`https://nomoreparties.co/v1/wff-cohort-20/cards/${id}`, {
-    method: "DELETE",
-    headers: {
-      authorization: "b91af8f2-857f-407b-86ef-9cd78ad6bef5",
-      "Content-Type": "application/json",
-    },
-  }).catch((err) => {
-    console.error(err);
-  });
-  cardElement.remove();
+  fetchDeleteCard(id)
+    .then(() => {
+      cardElement.remove();
+    })
+    .catch((err) => {
+      console.error(err);
+    });
 }

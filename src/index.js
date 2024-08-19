@@ -8,15 +8,20 @@ import {
 } from "./components/modal.js";
 import { likeCard, deleteCard } from "./components/card.js";
 import { enableValidation, clearValidation } from "./components/validation.js";
-import { getInitialCards, fillInfoOnLoad } from "./components/api.js";
+import {
+  getInitialCards,
+  fillInfoOnLoad,
+  fetchEditFormSubmit,
+  fetchNewPlaceFormSubmit,
+  fetchChangeAvatarSubmit,
+} from "./components/api.js";
 
 const validationConfig = {
   formSelector: ".popup__form",
   inputSelector: ".popup__input",
   submitButtonSelector: ".popup__button",
   inactiveButtonClass: "popup__button_disabled",
-  inputErrorClass: "popup__input_type_error",
-  errorClass: "popup__error_visible",
+  inputErrorActiveClass: "popup__input-error-text_active",
 };
 
 const placesList = document.querySelector(".places__list");
@@ -24,10 +29,25 @@ const popups = document.querySelectorAll(".popup");
 const avatarImage = document.querySelector(".profile__image");
 const profileName = document.querySelector(".profile__title");
 const profileDescription = document.querySelector(".profile__description");
+let personalId = ""
 
-fillInfoOnLoad(avatarImage, profileName, profileDescription);
-
-getInitialCards(placesList, openCardModal);
+fillInfoOnLoad().then((res) => {
+  avatarImage.style.backgroundImage = `url('${res.avatar}')`;
+  profileName.textContent = res.name;
+  profileDescription.textContent = res.about;
+  personalId = res._id;
+  getInitialCards()
+    .then((result) => {
+      result.forEach((cardInfo) => {
+        placesList.append(
+          createCard(cardInfo, likeCard, deleteCard, openCardModal, personalId)
+        );
+      });
+    })
+    .catch((err) => {
+      console.error(err);
+    });
+});
 
 popups.forEach((popup) => {
   popup.classList.add("popup_is-animated");
@@ -35,9 +55,6 @@ popups.forEach((popup) => {
     if (evt.target.classList.contains("popup__close")) {
       closePopup(popup);
     }
-  });
-
-  window.addEventListener("click", (evt) => {
     closePopupByOverlay(evt);
   });
 });
@@ -72,39 +89,24 @@ function handleEditFormSubmit(evt) {
   evt.preventDefault();
   const name = nameInput.value;
   const job = jobInput.value;
-  renderLoading(true);
-  fetch("https://nomoreparties.co/v1/wff-cohort-20/users/me", {
-    method: "PATCH",
-    headers: {
-      authorization: "b91af8f2-857f-407b-86ef-9cd78ad6bef5",
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      name: name,
-      about: job,
-    }),
-  })
-    .then((res) =>
-      res.ok ? res.json() : Promise.reject(`Ошибка: ${res.status}`)
-    )
+  renderLoading(true, editPopup);
+  fetchEditFormSubmit(name, job)
     .then((res) => {
       profileName.textContent = res.name;
       profileDescription.textContent = res.about;
+      closePopup(editPopup, editPopup);
     })
     .catch((err) => {
       console.error(err);
     })
     .finally(() => {
-      renderLoading(false);
+      renderLoading(false, editPopup);
     });
-
-  closePopup(editPopup);
 }
 
 formEdit.addEventListener("submit", handleEditFormSubmit);
 
 // add new card form
-
 const addCardButton = document.querySelector(".profile__add-button");
 const addCardPopup = document.querySelector(".popup_type_new-card");
 const formNewPlace = document.forms.newPlace;
@@ -124,83 +126,55 @@ function handleNewPlaceFormSubmit(evt) {
   const name = placeNameInput.value;
   const link = cardLinkInput.value;
 
-  renderLoading(true);
-  fetch("https://nomoreparties.co/v1/wff-cohort-20/cards", {
-    method: "POST",
-    headers: {
-      authorization: "b91af8f2-857f-407b-86ef-9cd78ad6bef5",
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      name: name,
-      link: link,
-    }),
-  })
-    .then((res) =>
-      res.ok ? res.json() : Promise.reject(`Ошибка: ${res.status}`)
-    )
+  renderLoading(true, addCardPopup);
+  fetchNewPlaceFormSubmit(name, link)
     .then((res) => {
       placesList.prepend(
-        createCard(res, likeCard, deleteCard, openCardModal, closePopup)
+        createCard(res, likeCard, deleteCard, openCardModal, personalId)
       );
+      closePopup(addCardPopup);
+      evt.target.reset();
     })
     .catch((err) => {
       console.error(err);
     })
     .finally(() => {
-      renderLoading(false);
+      renderLoading(false, addCardPopup);
     });
-
-  closePopup(addCardPopup);
-  evt.target.reset();
 }
 
 formNewPlace.addEventListener("submit", handleNewPlaceFormSubmit);
 
 // change avatar form
-
 const changeAvatarButton = document.querySelector(
-    ".profile__change-avatar-button"
+  ".profile__change-avatar-button"
 );
 const changeAvatarPopup = document.querySelector(".popup_type_avatar");
 const avatarLinkInput = document.querySelector(".popup__input_type_avatar");
 const formChangeAvatar = document.forms.changeAvatar;
 
 changeAvatarButton.addEventListener("click", () => {
-    openModal(changeAvatarPopup);
-    clearValidation(formChangeAvatar, validationConfig);
+  openModal(changeAvatarPopup);
+  clearValidation(formChangeAvatar, validationConfig);
 });
 
 function handleChangeAvatarSubmit(evt) {
-    evt.preventDefault();
-    const link = avatarLinkInput.value;
-    
-    renderLoading(true);
-    fetch("https://nomoreparties.co/v1/wff-cohort-20/users/me/avatar", {
-        method: "PATCH",
-        headers: {
-            authorization: "b91af8f2-857f-407b-86ef-9cd78ad6bef5",
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-            avatar: link,
-        }),
-    })
-    .then((res) =>
-        res.ok ? res.json() : Promise.reject(`Ошибка: ${res.status}`)
-)
-.then((res) => {
-    avatarImage.style.backgroundImage = `url('${res.avatar}')`;
-})
-.catch((err) => {
-    console.error(err);
-})
-.finally(() => {
-    renderLoading(false);
-});
+  evt.preventDefault();
+  const link = avatarLinkInput.value;
 
-closePopup(changeAvatarPopup);
-evt.target.reset();
+  renderLoading(true, changeAvatarPopup);
+  fetchChangeAvatarSubmit(link)
+    .then((res) => {
+      avatarImage.style.backgroundImage = `url('${res.avatar}')`;
+      closePopup(changeAvatarPopup);
+      evt.target.reset();
+    })
+    .catch((err) => {
+      console.error(err);
+    })
+    .finally(() => {
+      renderLoading(false, changeAvatarPopup);
+    });
 }
 
 formChangeAvatar.addEventListener("submit", handleChangeAvatarSubmit);

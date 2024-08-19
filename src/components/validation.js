@@ -2,11 +2,12 @@ function showInputError(
   formElement,
   inputElement,
   errorMessage,
-  inputErrorClass
+  inputErrorClass,
+  inputErrorActiveClass
 ) {
   const errorElement = formElement.querySelector(`.${inputElement.id}-error`);
   errorElement.textContent = errorMessage;
-  errorElement.classList.add("popup__input-error-text_active");
+  errorElement.classList.add(inputErrorActiveClass);
   inputElement.classList.add(inputErrorClass);
 };
 
@@ -17,13 +18,12 @@ function hideInputError(formElement, inputElement, inputErrorClass) {
     errorElement.textContent = "";
   }
   inputElement.classList.remove(inputErrorClass);
+  inputElement.setCustomValidity("");
 };
 
-function checkInputValidity(formElement, inputElement, inputErrorClass) {
+function checkInputValidity(formElement, inputElement, inputErrorClass, inputErrorActiveClass) {
   if (inputElement.validity.patternMismatch) {
-    inputElement.setCustomValidity(
-      "Разрешены только латинские, кириллические буквы, знаки дефиса и пробелы"
-    );
+    inputElement.setCustomValidity(inputElement.dataset.errorMessage);
   } else {
     inputElement.setCustomValidity("");
   }
@@ -33,7 +33,8 @@ function checkInputValidity(formElement, inputElement, inputErrorClass) {
       formElement,
       inputElement,
       inputElement.validationMessage,
-      inputErrorClass
+      inputErrorClass, 
+      inputErrorActiveClass
     );
   } else {
     hideInputError(formElement, inputElement, inputErrorClass);
@@ -65,7 +66,7 @@ function setEventListeners(formElement, setting) {
   hasInvalidInput(inputList);
   inputList.forEach((inputElement) => {
     inputElement.addEventListener("input", function () {
-      checkInputValidity(formElement, inputElement, setting.inputErrorClass);
+      checkInputValidity(formElement, inputElement, setting.inputErrorClass, setting.inputErrorActiveClass);
       hasInvalidInput(inputList);
       toggleButtonState(inputList, buttonElement, setting.inactiveButtonClass);
     });

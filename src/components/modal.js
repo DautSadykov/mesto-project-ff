@@ -20,10 +20,10 @@ export function closeOnKeyDown(evt) {
   }
 }
 
-export function renderLoading(isLoading, saveButton) {
+export function renderLoading(isLoading, form) {
   if (isLoading) {
-    document.querySelector(".popup__button").textContent = "Сохраняется...";
+    form.querySelector(".popup__button").textContent = "Сохраняется...";
   } else {
-    document.querySelector(".popup__button").textContent = "Сохранить";
+    form.querySelector(".popup__button").textContent = "Сохранить";
   }
 }
