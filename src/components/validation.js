@@ -9,12 +9,13 @@ function showInputError(
   errorElement.textContent = errorMessage;
   errorElement.classList.add(inputErrorActiveClass);
   inputElement.classList.add(inputErrorClass);
+
 };
 
-function hideInputError(formElement, inputElement, inputErrorClass) {
+function hideInputError(formElement, inputElement, inputErrorClass, inputErrorActiveClass) {
   const errorElement = formElement.querySelector(`.${inputElement.id}-error`);
   if (errorElement) {
-    errorElement.classList.remove("popup__input-error-text_active");
+    errorElement.classList.remove(inputErrorActiveClass);
     errorElement.textContent = "";
   }
   inputElement.classList.remove(inputErrorClass);
@@ -33,11 +34,11 @@ function checkInputValidity(formElement, inputElement, inputErrorClass, inputErr
       formElement,
       inputElement,
       inputElement.validationMessage,
-      inputErrorClass, 
+      inputErrorClass,
       inputErrorActiveClass
     );
   } else {
-    hideInputError(formElement, inputElement, inputErrorClass);
+    hideInputError(formElement, inputElement, inputErrorClass, inputErrorActiveClass);
   }
 };
 

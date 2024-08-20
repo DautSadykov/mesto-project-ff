@@ -4,7 +4,6 @@ import {
   openModal,
   closePopupByOverlay,
   closePopup,
-  renderLoading,
 } from "./components/modal.js";
 import { likeCard, deleteCard } from "./components/card.js";
 import { enableValidation, clearValidation } from "./components/validation.js";
@@ -22,6 +21,7 @@ const validationConfig = {
   submitButtonSelector: ".popup__button",
   inactiveButtonClass: "popup__button_disabled",
   inputErrorActiveClass: "popup__input-error-text_active",
+  inputErrorClass: "popup__input-type-error",
 };
 
 const placesList = document.querySelector(".places__list");
@@ -59,6 +59,14 @@ popups.forEach((popup) => {
   });
 });
 
+export function renderLoading(isLoading, form) {
+  if (isLoading) {
+    form.querySelector(".popup__button").textContent = "Сохраняется...";
+  } else {
+    form.querySelector(".popup__button").textContent = "Сохранить";
+  }
+}
+
 export function openCardModal(cardInfo) {
   const cardPopup = document.querySelector(".popup_type_image");
   cardPopup.querySelector(".popup__image").src = cardInfo.link;
@@ -94,7 +102,7 @@ function handleEditFormSubmit(evt) {
     .then((res) => {
       profileName.textContent = res.name;
       profileDescription.textContent = res.about;
-      closePopup(editPopup, editPopup);
+      closePopup(editPopup);
     })
     .catch((err) => {
       console.error(err);

@@ -19,11 +19,3 @@ export function closeOnKeyDown(evt) {
     closePopup(document.querySelector(".popup_is-opened"));
   }
 }
-
-export function renderLoading(isLoading, form) {
-  if (isLoading) {
-    form.querySelector(".popup__button").textContent = "Сохраняется...";
-  } else {
-    form.querySelector(".popup__button").textContent = "Сохранить";
-  }
-}
